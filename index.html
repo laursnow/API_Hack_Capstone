@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>App</title>
+        <script
+          src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <link href="style.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+      <main>
+        <h1>Test</h1>
+          <form action="#" class="js-search-form">
+
+            <label for="latitude">Latitude</label>
+            <input type="text" id="js-query-lat" name="latitude" class="input-option"><br>
+
+            <label for="longitude">Longitude</label>
+            <input type="text" id="js-query-long" name="longitude" class="input-option"><br>
+
+            <label for="radius">Radius</label>
+            <input type="text" id="js-query-radius" name="radius" class="input-option"><br>
+
+            <h2>Show:</h2>
+            <label for="bus-stops">Bus Stops</label>
+            <input type="checkbox" id="js-query-type" name="bus-stops" class="input-option"><br>
+            <label for="trolley-stops">Trolley Stops</label>
+            <input type="checkbox" id="js-query-type" name="trolley-stops" class="input-option"><br>
+            <label for="rail-stations">Rail Stations</label>
+            <input type="checkbox" id="js-query-type" name="rail-stations" class="input-option"><br>
+            <label for="sales-stations">Sales Stations</label>
+            <input type="checkbox" id="js-query-type" name="sales-stations" class="input-option">
+            
+
+            <button class="button" id="search">Search</button>
+          </form>
+          
+          <h2>Results</h2>
+          <div class="js-search-results">
+            
+          </div>
+      </main>
+      <script src="index.js"></script>
+    </body>
+</html>
