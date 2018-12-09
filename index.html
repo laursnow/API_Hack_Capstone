@@ -13,32 +13,33 @@
         <h1>Test</h1>
           <form action="#" class="js-search-form">
 
-            <label for="latitude">Latitude</label>
-            <input type="text" id="js-query-lat" name="latitude" class="input-option"><br>
-
             <label for="longitude">Longitude</label>
             <input type="text" id="js-query-long" name="longitude" class="input-option"><br>
+
+            <label for="latitude">Latitude</label>
+            <input type="text" id="js-query-lat" name="latitude" class="input-option"><br>
 
             <label for="radius">Radius</label>
             <input type="text" id="js-query-radius" name="radius" class="input-option"><br>
 
             <h2>Show:</h2>
             <label for="bus-stops">Bus Stops</label>
-            <input type="checkbox" id="js-query-type" name="bus-stops" class="input-option"><br>
+            <input type="checkbox" id="js-query-type" name="type" value="bus_stops" class="input-option"><br>
             <label for="trolley-stops">Trolley Stops</label>
-            <input type="checkbox" id="js-query-type" name="trolley-stops" class="input-option"><br>
+            <input type="checkbox" id="js-query-type" name="type" value="trolley_stops" class="input-option"><br>
             <label for="rail-stations">Rail Stations</label>
-            <input type="checkbox" id="js-query-type" name="rail-stations" class="input-option"><br>
-            <label for="sales-stations">Sales Stations</label>
-            <input type="checkbox" id="js-query-type" name="sales-stations" class="input-option">
+            <input type="checkbox" id="js-query-type" name="type" value="rail_stations" class="input-option"><br>
+            <label for="sales-stations">Sales Locations</label>
+            <input type="checkbox" id="js-query-type" name="sales_locations" class="input-option">
             
 
             <button class="button" id="search">Search</button>
           </form>
           
-          <h2>Results</h2>
+          <h2>Results</h2><div class="container"><ul>
           <div class="js-search-results">
             
+          </div></ul>
           </div>
       </main>
       <script src="index.js"></script>
