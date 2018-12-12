@@ -4,33 +4,35 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
         <title>App</title>
-        <script
-          src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+        integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+        crossorigin=""/>
         <link href="style.css" rel="stylesheet" type="text/css" />
+        
     </head>
     <body>
       <main>
-        <h1>Test</h1>
+        <h1>Public Transportation Finder</h1>
           <form action="#" class="js-search-form">
 
-            <label for="longitude">Longitude</label>
-            <input type="text" id="js-query-long" name="longitude" class="input-option"><br>
+            <label for="longitude">Street</label>
+            <input type="text" id="js-query-street" name="Street" class="input-option"><br>
 
-            <label for="latitude">Latitude</label>
-            <input type="text" id="js-query-lat" name="latitude" class="input-option"><br>
+            <label for="latitude">City</label>
+            <input type="text" id="js-query-city" name="City" class="input-option"><br>
 
             <label for="radius">Radius</label>
             <input type="text" id="js-query-radius" name="radius" class="input-option"><br>
 
             <h2>Show:</h2>
             <label for="bus-stops">Bus Stops</label>
-            <input type="checkbox" id="js-query-type" name="type" value="bus_stops" class="input-option"><br>
+            <input type="checkbox" id="js-query-type-bus" name="type" value="bus_stops" class="input-option"><br>
             <label for="trolley-stops">Trolley Stops</label>
-            <input type="checkbox" id="js-query-type" name="type" value="trolley_stops" class="input-option"><br>
+            <input type="checkbox" id="js-query-type-trolley" name="type" value="trolley_stops" class="input-option"><br>
             <label for="rail-stations">Rail Stations</label>
-            <input type="checkbox" id="js-query-type" name="type" value="rail_stations" class="input-option"><br>
+            <input type="checkbox" id="js-query-type-rail" name="type" value="rail_stations" class="input-option"><br>
             <label for="sales-stations">Sales Locations</label>
-            <input type="checkbox" id="js-query-type" name="sales_locations" class="input-option">
+            <input type="checkbox" id="js-query-type-sales" name="sales_locations" class="input-option">
             
 
             <button class="button" id="search">Search</button>
@@ -41,7 +43,14 @@
             
           </div></ul>
           </div>
+          <div id="mapid"></div>
       </main>
+      <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+        integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+        crossorigin=""></script>
+      <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
       <script src="index.js"></script>
+      
     </body>
 </html>
+
