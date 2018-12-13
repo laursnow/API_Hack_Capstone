@@ -75,42 +75,35 @@ var salesIcon = new L.Icon({
 
 // APP FUNCTION
  
-function convertSearchTerms(street, city, radius, type) {
+function convertSearchTerms(street, city, radius) {
   let space = '%20';
   let address = street.concat(space, city);
-  console.log(address);
   $.get('https://nominatim.openstreetmap.org/search?format=json&q='+address, function(location){
-    console.log(location);
     let latInput = location[0]['lat'];
     let lonInput = location[0]['lon'];
-    console.log(latInput);
     const searchTerms = {
-      lonInput, latInput, radius, type
+      lonInput, latInput, radius
     };
-    console.log(type);
-    console.log(searchTerms);
     searchAPI(searchTerms, generateLocationIcons);
     displayMapResults(latInput, lonInput, radius);
   });
 }
 
+var typeInput = [];
+
 function watchSubmit() {
   $('.js-search-form').on( 'submit', event => {
     event.preventDefault();
     const streetInput = $('#js-query-street').val();
-    console.log(streetInput);
     const cityInput = $('#js-query-city').val();
-    console.log(cityInput);
     const radiusInput = $('#js-query-radius').val();
-    console.log(radiusInput);
-    const typeInput = [];
+    typeInput = [];
     $('.js-search-form').find('.input-option').each(function(){
       if ( $(this).prop('checked') == true ) { 
         let typeChecked = $(this).val();    
-        console.log(typeChecked);
         typeInput.push(typeChecked);   
       }
-    convertSearchTerms(streetInput, cityInput, radiusInput, typeInput);
+    convertSearchTerms(streetInput, cityInput, radiusInput);
     });
   });}
 
@@ -121,8 +114,7 @@ function searchAPI(params, callback) {
   const data = {
     lon: params.lonInput,
     lat: params.latInput,
-    radius: params.radius,
-    type: params.type
+    radius: params.radius
   };
   $.ajax({
     url: SEPTA_LOCATION_URL, data,
@@ -136,21 +128,22 @@ function generateLocationIcons(data) {
     mymap.removeLayer(markerGroup[i]);
   }
   markerGroup = [];
+  console.log(typeInput);
   for (let i = 0; i < data.length; i++)
   {
-    if (data[i].location_type == 'bus_stops') {
+    if (typeInput.includes('bus_stops') && data[i].location_type == 'bus_stops') {
       var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span style="bus">Bus Stop: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     }
-    else if (data[i].location_type == 'rail_stations') {
+    else if (typeInput.includes('rail_stations') && data[i].location_type == 'rail_stations') {
       var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: railIcon}).addTo(mymap).bindPopup(`<span style="rail">Rail Station: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     }
-    else if (data[i].location_type == 'trolley_stops') {
+    else if (typeInput.includes('trolley_stops') && data[i].location_type == 'trolley_stops') {
       var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: trolleyIcon}).addTo(mymap).bindPopup(`<span style="trolley">Trolley Stop: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     }
-    else if (data[i].location_type == 'sales_locations') {
+    else if (typeInput.includes('sales_locations') && data[i].location_type == 'sales_locations') {
       var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: salesIcon}).addTo(mymap).bindPopup(`<span style="sales">Sales Location: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     }
