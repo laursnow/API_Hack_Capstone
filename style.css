@@ -1,3 +1,23 @@
 #mapid { 
     height: 500px;
     width: 500px; }
+
+    #bus {
+        font-weight: bold;
+        color: blue;
+    }
+
+    #rail {
+        font-weight: bold;
+        color: red;
+    }
+ 
+    #trolley {
+        font-weight: bold;
+        color: #999900;
+    }
+
+    #sales {
+        font-weight: bold;
+        color: purple;
+    }

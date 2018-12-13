@@ -133,19 +133,19 @@ function generateLocationIcons(data) {
   for (let i = 0; i < data.length; i++)
   {
     if (typeInput.includes('bus_stops') && data[i].location_type == 'bus_stops') {
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span style="bus">Bus Stop: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
+      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span id="bus">Bus Stop: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     }
     else if (typeInput.includes('rail_stations') && data[i].location_type == 'rail_stations') {
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: railIcon}).addTo(mymap).bindPopup(`<span style="rail">Rail Station: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
+      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: railIcon}).addTo(mymap).bindPopup(`<span id="rail">Rail Station: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     }
     else if (typeInput.includes('trolley_stops') && data[i].location_type == 'trolley_stops') {
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: trolleyIcon}).addTo(mymap).bindPopup(`<span style="trolley">Trolley Stop: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
+      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: trolleyIcon}).addTo(mymap).bindPopup(`<span id="trolley">Trolley Stop: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     }
     else if (typeInput.includes('sales_locations') && data[i].location_type == 'sales_locations') {
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: salesIcon}).addTo(mymap).bindPopup(`<span style="sales">Sales Location: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
+      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: salesIcon}).addTo(mymap).bindPopup(`<span id="sales">Sales Location: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     }
   }
