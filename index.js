@@ -27,6 +27,7 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
 
 var markerGroup = [];
 var circleGroup = [];
+var currentLocationMarker = [];
 
 var myLocationIcon = new L.Icon({
   iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -156,6 +157,10 @@ function displayMapResults(lat, lon, radiusInMiles) {
     mymap.removeLayer(circleGroup[i]);
   }
   circleGroup = [];
+  for (let i = 0; i < currentLocationMarker.length; i++) {
+    mymap.removeLayer(currentLocationMarker[i]);
+  }
+  currentLocationMarker = [];
   var youAreHereMarker = L.marker([lat, lon], {icon: myLocationIcon}).addTo(mymap).bindPopup('You are here').openPopup();
   (mymap).setView([lat, lon], 16);
   let radiusInMeters = radiusInMiles * 1609.344;
@@ -166,7 +171,7 @@ function displayMapResults(lat, lon, radiusInMiles) {
     radius: radiusInMeters
   }).addTo(mymap);
   circleGroup.push(circle);
-  markerGroup.push(youAreHereMarker);
+  currentLocationMarker.push(youAreHereMarker);
 }
 
 
