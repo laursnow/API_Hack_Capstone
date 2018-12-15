@@ -92,19 +92,57 @@ function convertSearchTerms(street, city, radius) {
 
 var typeInput = [];
 
+
+function toggleTextInputs() {
+  $('#js-current-location').change( function() {
+    if (this.checked) {
+      $('#js-query-street').prop('disabled', true);
+      $('#js-query-city').prop('disabled', true);      
+    }
+    else {
+      $('#js-query-street').prop('disabled', false);
+      $('#js-query-city').prop('disabled', false);
+    }
+  });
+}
+
+
+function getCurrentLocation(radius) {
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(function(position){ 
+      let latInput = position.coords.latitude;
+      let lonInput = position.coords.longitude;
+      const searchTerms = {
+        lonInput, latInput, radius
+      };
+      searchAPI(searchTerms, generateLocationIcons);
+      displayMapResults(latInput, lonInput, radius);
+    });
+  }
+  else {
+    alert('Browser/device doesn\'t support geolocation! Please enter location manually.');
+  }
+}
+
 function watchSubmit() {
   $('.js-search-form').on( 'submit', event => {
     event.preventDefault();
-    const streetInput = $('#js-query-street').val();
-    const cityInput = $('#js-query-city').val();
-    const radiusInput = $('#js-query-radius').val();
+    if ( $('#js-current-location').prop('checked') == true ) {
+      const radiusInput = $('#js-query-radius').val();
+      getCurrentLocation(radiusInput);
+    }
+    else {
+      const streetInput = $('#js-query-street').val();
+      const cityInput = $('#js-query-city').val();
+      const radiusInput = $('#js-query-radius').val();
+      convertSearchTerms(streetInput, cityInput, radiusInput);
+    }
     typeInput = [];
     $('.js-search-form').find('.input-option').each(function(){
       if ( $(this).prop('checked') == true ) { 
         let typeChecked = $(this).val();    
         typeInput.push(typeChecked);   
       }
-    convertSearchTerms(streetInput, cityInput, radiusInput);
     });
   });}
 
@@ -124,18 +162,28 @@ function searchAPI(params, callback) {
   });
 }
 
-function generateLocationIcons(data) {
-  for (let i = 0; i < markerGroup.length; i++) {
+function generateLocationIcons(data) {  
+  try {
+    if (data == "") {
+      throw new Error('API data is empty');
+    }
+  }
+  catch (e) {
+    console.log(e.name + ': ' + e.message);
+    alert('No results for entered parameters.');
+  }
+   for (let i = 0; i < markerGroup.length; i++) {
     mymap.removeLayer(markerGroup[i]);
   }
   markerGroup = [];
-  console.log(typeInput);
   for (let i = 0; i < data.length; i++)
   {
     if (typeInput.includes('bus_stops') && data[i].location_type == 'bus_stops') {
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span id="bus">Bus Stop: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
-      markerGroup.push(marker);
-    }
+      let routeID = data[i].location_id;
+      searchRoutesAPI(routeID, generateRouteID);
+      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span id="bus">Bus Stop: </span>${data[i].location_name}, ${data[i].distance} miles away.`).openPopup();
+      markerGroup.push(marker);  
+      }
     else if (typeInput.includes('rail_stations') && data[i].location_type == 'rail_stations') {
       var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: railIcon}).addTo(mymap).bindPopup(`<span id="rail">Rail Station: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
@@ -147,10 +195,25 @@ function generateLocationIcons(data) {
     else if (typeInput.includes('sales_locations') && data[i].location_type == 'sales_locations') {
       var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: salesIcon}).addTo(mymap).bindPopup(`<span id="sales">Sales Location: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
-    }
+    } 
+  }
+  
+  function generateRouteID(data) {
+    let routeArray = Object.keys(data);
+    console.log(routeArray);
   }
 }
 
+function searchRoutesAPI(route, callback) {
+  const data = {
+    req1: route
+  };
+  $.ajax({
+    url: 'http://www3.septa.org/hackathon/BusSchedules/', data,
+    dataType: 'jsonp',
+    success: callback
+  });
+}
 
 function displayMapResults(lat, lon, radiusInMiles) {
   for (let i = 0; i < circleGroup.length; i++) {
@@ -174,7 +237,11 @@ function displayMapResults(lat, lon, radiusInMiles) {
   currentLocationMarker.push(youAreHereMarker);
 }
 
+function displayListTemplate() {
+  $('.js-search-results').append();
+}
 
+$(toggleTextInputs);
 $(watchSubmit);
 
 //    $('#js-query-type-bus').click(function() {
