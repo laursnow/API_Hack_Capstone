@@ -96,8 +96,8 @@ var typeInput = [];
 function toggleTextInputs() {
   $('#js-current-location').change( function() {
     if (this.checked) {
-      $('#js-query-street').prop('disabled', true);
-      $('#js-query-city').prop('disabled', true);      
+      $('#js-query-street').val("").prop('disabled', true);
+      $('#js-query-city').val("").prop('disabled', true);      
     }
     else {
       $('#js-query-street').prop('disabled', false);
@@ -145,8 +145,6 @@ function watchSubmit() {
       }
     });
   });}
-
-
 
 
 function searchAPI(params, callback) {
