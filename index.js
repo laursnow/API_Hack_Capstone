@@ -75,7 +75,8 @@ var salesIcon = new L.Icon({
 });
 
 // APP FUNCTION
- 
+// create file for each API call
+
 function convertSearchTerms(street, city, radius) {
   let space = '%20';
   let address = street.concat(space, city);
@@ -96,8 +97,8 @@ var typeInput = [];
 function toggleTextInputs() {
   $('#js-current-location').change( function() {
     if (this.checked) {
-      $('#js-query-street').val("").prop('disabled', true);
-      $('#js-query-city').val("").prop('disabled', true);      
+      $('#js-query-street').val('').prop('disabled', true);
+      $('#js-query-city').val('').prop('disabled', true);      
     }
     else {
       $('#js-query-street').prop('disabled', false);
@@ -162,7 +163,7 @@ function searchAPI(params, callback) {
 
 function generateLocationIcons(data) {  
   try {
-    if (data == "") {
+    if (data == '') {
       throw new Error('API data is empty');
     }
   }
@@ -170,7 +171,7 @@ function generateLocationIcons(data) {
     console.log(e.name + ': ' + e.message);
     alert('No results for entered parameters.');
   }
-   for (let i = 0; i < markerGroup.length; i++) {
+  for (let i = 0; i < markerGroup.length; i++) {
     mymap.removeLayer(markerGroup[i]);
   }
   markerGroup = [];
@@ -178,10 +179,12 @@ function generateLocationIcons(data) {
   {
     if (typeInput.includes('bus_stops') && data[i].location_type == 'bus_stops') {
       let routeID = data[i].location_id;
-      searchRoutesAPI(routeID, generateRouteID);
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span id="bus">Bus Stop: </span>${data[i].location_name}, ${data[i].distance} miles away.`).openPopup();
-      markerGroup.push(marker);  
-      }
+      searchRoutesAPI(routeID, routes => {
+        let busNumbers = Object.keys(routes).join(',');
+        var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span id="bus">Bus Stop: </span>${data[i].location_name}, ${data[i].distance} miles away.<br>Bus Numbers: ${busNumbers}`).openPopup();
+      markerGroup.push(marker);
+        console.log(`routes function is working`, routes)});
+    }
     else if (typeInput.includes('rail_stations') && data[i].location_type == 'rail_stations') {
       var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: railIcon}).addTo(mymap).bindPopup(`<span id="rail">Rail Station: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
@@ -194,11 +197,6 @@ function generateLocationIcons(data) {
       var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: salesIcon}).addTo(mymap).bindPopup(`<span id="sales">Sales Location: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     } 
-  }
-  
-  function generateRouteID(data) {
-    let routeArray = Object.keys(data);
-    console.log(routeArray);
   }
 }
 
@@ -235,9 +233,9 @@ function displayMapResults(lat, lon, radiusInMiles) {
   currentLocationMarker.push(youAreHereMarker);
 }
 
-function displayListTemplate() {
-  $('.js-search-results').append();
-}
+// function displayListTemplate() {
+//   $('.js-search-results').append();
+// }
 
 $(toggleTextInputs);
 $(watchSubmit);
