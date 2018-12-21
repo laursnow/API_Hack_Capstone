@@ -87,22 +87,33 @@ function addLocationResultsToDataStore(results) {
   for (let i = 0; i < results.length; i++)
   {
     if (typeInputList.includes('bus_stops') && results[i].location_type == 'bus_stops') {
-      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: [], });
+      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: null, });
       
     }
     else if (typeInputList.includes('rail_stations') && results[i].location_type == 'rail_stations') {
-      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: [], });
+      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: null, });
     } 
     else if (typeInputList.includes('trolley_stops') && results[i].location_type == 'trolley_stops') {
-      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: [], });
+      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: null, });
       console.log(`test id ${results[i].location_id}`);
     }
     else if (typeInputList.includes('sales_locations') && results[i].location_type == 'sales_locations') {
-      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: [], });
+      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: null, });
     } 
   }
 }
 
+function addRoutesToDataStore(results) {
+  if (DATA_STORE[i].location_type == 'trolley_stops' || DATA_STORE[i].location_type == 'bus_stops') {
+    for (let i=0; i < results.length; i++) {
+      searchRoutesAPI(DATA_STORE[i].location_id, pushRoutes => {
+        let busNumbers = Object.keys(pushRoutes).join(', ');
+        DATA_STORE[i].routes.push(busNumbers);
+      });
+    }
+  }
+}
+    
 
 // API CALLS
 
@@ -264,6 +275,7 @@ function generateResultLocationMarkers(data) {
   addLocationResultsToDataStore(data); 
   checkResultLocationData(data);
   clearMapMarkers();
+  searchRoutesAPI(DATA_STORE, addRoutesToDataStore);
   for (let i = 0; i < data.length; i++)
   {
     if (DATA_STORE[i].location_type == 'bus_stops') {
