@@ -83,7 +83,7 @@ function clearDATA_STORE() {
 }
 
 function addLocationResultsToDataStore(results) {
-  // clearDATA_STORE();
+  clearDATA_STORE();
   for (let i = 0; i < results.length; i++)
   {
     if (typeInputList.includes('bus_stops') && results[i].location_type == 'bus_stops') {
@@ -99,10 +99,8 @@ function addLocationResultsToDataStore(results) {
     }
     else if (typeInputList.includes('sales_locations') && results[i].location_type == 'sales_locations') {
       DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: [], });
-    }
-    
+    } 
   }
-  console.log(`data_store is working ${DATA_STORE[0].location_id} & ${DATA_STORE[1].location_id}`);
 }
 
 
@@ -268,24 +266,24 @@ function generateResultLocationMarkers(data) {
   clearMapMarkers();
   for (let i = 0; i < data.length; i++)
   {
-    if (typeInputList.includes('bus_stops') && data[i].location_type == 'bus_stops') {
+    if (DATA_STORE[i].location_type == 'bus_stops') {
       let routeID = data[i].location_id;
       searchRoutesAPI(routeID, routes => {
         let busNumbers = Object.keys(routes).join(', ');
-        var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span id="bus">Bus Stop: </span>${data[i].location_name}, ${data[i].distance} miles away.<br>Stops here: ${busNumbers}`).openPopup();
+        var marker = L.marker([DATA_STORE[i].location_lat, DATA_STORE[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span id="bus">Bus Stop: </span>${DATA_STORE[i].location_name}, ${DATA_STORE[i].distance} miles away.<br>Stops here: ${busNumbers}`).openPopup();
         markerGroup.push(marker);
         console.log('routes function is working', routes);});
     }
-    else if (typeInputList.includes('rail_stations') && data[i].location_type == 'rail_stations') {
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: railIcon}).addTo(mymap).bindPopup(`<span id="rail">Rail Station: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
+    else if (DATA_STORE[i].location_type == 'rail_stations') {
+      var marker = L.marker([DATA_STORE[i].location_lat, DATA_STORE[i].location_lon], {icon: railIcon}).addTo(mymap).bindPopup(`<span id="rail">Rail Station: </span>${DATA_STORE[i].location_name}, ${DATA_STORE[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     }
-    else if (typeInputList.includes('trolley_stops') && data[i].location_type == 'trolley_stops') {
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: trolleyIcon}).addTo(mymap).bindPopup(`<span id="trolley">Trolley Stop: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
+    else if (DATA_STORE[i].location_type == 'trolley_stops') {
+      var marker = L.marker([DATA_STORE[i].location_lat, DATA_STORE[i].location_lon], {icon: trolleyIcon}).addTo(mymap).bindPopup(`<span id="trolley">Trolley Stop: </span>${DATA_STORE[i].location_name}, ${DATA_STORE[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     }
-    else if (typeInputList.includes('sales_locations') && data[i].location_type == 'sales_locations') {
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: salesIcon}).addTo(mymap).bindPopup(`<span id="sales">Sales Location: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
+    else if (DATA_STORE[i].location_type == 'sales_locations') {
+      var marker = L.marker([DATA_STORE[i].location_lat, DATA_STORE[i].location_lon], {icon: salesIcon}).addTo(mymap).bindPopup(`<span id="sales">Sales Location: </span>${DATA_STORE[i].location_name}, ${DATA_STORE[i].distance} miles away`).openPopup();
       markerGroup.push(marker);
     } 
   }
