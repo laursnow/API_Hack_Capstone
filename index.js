@@ -74,6 +74,37 @@ var markerGroup = [];
 var circleGroup = [];
 var currentLocationMarker = [];
 var typeInputList = [];
+const DATA_STORE = [];
+
+// DATA_STORE
+
+function clearDATA_STORE() {
+  DATA_STORE.length = 0;
+}
+
+function addLocationResultsToDataStore(results) {
+  // clearDATA_STORE();
+  for (let i = 0; i < results.length; i++)
+  {
+    if (typeInputList.includes('bus_stops') && results[i].location_type == 'bus_stops') {
+      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: [], });
+      
+    }
+    else if (typeInputList.includes('rail_stations') && results[i].location_type == 'rail_stations') {
+      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: [], });
+    } 
+    else if (typeInputList.includes('trolley_stops') && results[i].location_type == 'trolley_stops') {
+      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: [], });
+      console.log(`test id ${results[i].location_id}`);
+    }
+    else if (typeInputList.includes('sales_locations') && results[i].location_type == 'sales_locations') {
+      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: [], });
+    }
+    
+  }
+  console.log(`data_store is working ${DATA_STORE[0].location_id} & ${DATA_STORE[1].location_id}`);
+}
+
 
 // API CALLS
 
@@ -231,7 +262,8 @@ function createTypeListInput() {
   });
 }
 
-function generateResultLocationMarkers(data) {  
+function generateResultLocationMarkers(data) { 
+  addLocationResultsToDataStore(data); 
   checkResultLocationData(data);
   clearMapMarkers();
   for (let i = 0; i < data.length; i++)
