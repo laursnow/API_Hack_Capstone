@@ -12,6 +12,7 @@ const SEPTA_SCHEDULES_URL = 'http://www3.septa.org/hackathon/BusSchedules/';
 
 // MAP INIT
 
+// eslint-disable-next-line no-undef
 var mymap = L.map('mapid').setView([39.9526, -75.1652], 14);
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -20,6 +21,9 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
   id: 'mapbox.streets',
   accessToken: 'pk.eyJ1IjoibGF1cnNub3ciLCJhIjoiY2pwaGducTMwMHdlcDNrbXB6NXVoeTcwaCJ9.Kp7ataN-Jbmlq9E3zcuvcA'
 }).addTo(mymap);
+
+var markersLayer = new L.LayerGroup();
+mymap.addLayer(markersLayer);
 
 // MAP ICONS
 
@@ -74,47 +78,39 @@ var markerGroup = [];
 var circleGroup = [];
 var currentLocationMarker = [];
 var typeInputList = [];
-const DATA_STORE = [];
+const APP_DATA = [];
 
-// DATA_STORE
+// APP_DATA
 
-function clearDATA_STORE() {
-  DATA_STORE.length = 0;
+function clearAPP_DATA() {
+  APP_DATA.length = 0;
 }
 
-function addLocationResultsToDataStore(results) {
-  clearDATA_STORE();
+function compileAppData(results) {
+  clearAPP_DATA();
   for (let i = 0; i < results.length; i++)
   {
     if (typeInputList.includes('bus_stops') && results[i].location_type == 'bus_stops') {
-      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: null, });
+      APP_DATA.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance});
       
     }
     else if (typeInputList.includes('rail_stations') && results[i].location_type == 'rail_stations') {
-      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: null, });
+      APP_DATA.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance});
     } 
     else if (typeInputList.includes('trolley_stops') && results[i].location_type == 'trolley_stops') {
-      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: null, });
+      APP_DATA.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance});
       console.log(`test id ${results[i].location_id}`);
     }
     else if (typeInputList.includes('sales_locations') && results[i].location_type == 'sales_locations') {
-      DATA_STORE.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance, routes: null, });
+      APP_DATA.push({location_id: results[i].location_id, location_type: results[i].location_type, location_name: results[i].location_name, location_lat: results[i].location_lat, location_lon: results[i].location_lon, distance: results[i].distance});
     } 
   }
+  generateResultLocationMarkers();
 }
 
-function addRoutesToDataStore(results) {
-  if (DATA_STORE[i].location_type == 'trolley_stops' || DATA_STORE[i].location_type == 'bus_stops') {
-    for (let i=0; i < results.length; i++) {
-      searchRoutesAPI(DATA_STORE[i].location_id, pushRoutes => {
-        let busNumbers = Object.keys(pushRoutes).join(', ');
-        DATA_STORE[i].routes.push(busNumbers);
-      });
-    }
-  }
-}
+
+
     
-
 // API CALLS
 
 function searchRoutesAPI(route, callback) {
@@ -141,48 +137,6 @@ function searchStopLocationAPI(params, callback) {
   });
 }
 
-// function searchStopLocationAPI(params, callback) {
-//   const data = {
-//     lon: params.lonInput,
-//     lat: params.latInput,
-//     radius: params.radius
-//   };
-//   const url = SEPTA_STOP_LOCATION_URL + '?' + data;
-
-//   console.log(url);
-
-//   fetch(url)
-//     .then(response => {
-//       if (response.ok) {
-//         return response.json();
-//       }
-//       throw new Error(response.statusText);
-//     })
-//     .then(responseJson => callback(responseJson))
-//     .catch(err => {
-//       $('#js-error-message').text(`Something went wrong: ${err.message}`);
-//     });
-// }
-
-// function searchOpenMapsAPI(street, city, radius) {
-//   let streetNoSpaces = street.replace(/\s+/g, '%20');
-//   let space = '%20';
-//   let address = streetNoSpaces.concat(space, city);
-//   const url = OPEN_MAPS_URL + address;
-//   console.log(url);
-//   fetch(url, radius)
-//     .then(response => {
-//       if (response.ok) {
-//         return response.json();
-//       }
-//       throw new Error(response.statusText)
-//         .then(responseJson => convertAddressToCoords(responseJson, radius))
-//         .catch(err => {
-//           $('#js-error-message').text(`Something went wrong: ${err.message}`);
-//         });
-//     });
-// }
-
 function searchOpenMapsAPI(street, city, radius) {
   let space = '%20';
   let address = street.concat(space, city);
@@ -199,7 +153,7 @@ function convertAddressToCoords(location, radius) {
   const searchTerms = {
     lonInput, latInput, radius
   };
-  searchStopLocationAPI(searchTerms, generateResultLocationMarkers);
+  searchStopLocationAPI(searchTerms, compileAppData);
   generateCurrentLocationMarker(latInput, lonInput);
   generateRadiusCircle(latInput, lonInput, radius);
 }
@@ -233,7 +187,7 @@ function useCurrentLocation(radius) {
       const searchTerms = {
         lonInput, latInput, radius
       };
-      searchStopLocationAPI(searchTerms, generateResultLocationMarkers);
+      searchStopLocationAPI(searchTerms, compileAppData);
       generateCurrentLocationMarker(latInput, lonInput);
       generateRadiusCircle(latInput, lonInput, radius);
     });
@@ -271,35 +225,45 @@ function createTypeListInput() {
   });
 }
 
-function generateResultLocationMarkers(data) { 
-  addLocationResultsToDataStore(data); 
-  checkResultLocationData(data);
+
+function generateResultLocationMarkers() {  
   clearMapMarkers();
-  searchRoutesAPI(DATA_STORE, addRoutesToDataStore);
-  for (let i = 0; i < data.length; i++)
+  for (let i = 0; i < APP_DATA.length; i++)
   {
-    if (DATA_STORE[i].location_type == 'bus_stops') {
-      let routeID = data[i].location_id;
-      searchRoutesAPI(routeID, routes => {
-        let busNumbers = Object.keys(routes).join(', ');
-        var marker = L.marker([DATA_STORE[i].location_lat, DATA_STORE[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span id="bus">Bus Stop: </span>${DATA_STORE[i].location_name}, ${DATA_STORE[i].distance} miles away.<br>Stops here: ${busNumbers}`).openPopup();
-        markerGroup.push(marker);
-        console.log('routes function is working', routes);});
-    }
-    else if (DATA_STORE[i].location_type == 'rail_stations') {
-      var marker = L.marker([DATA_STORE[i].location_lat, DATA_STORE[i].location_lon], {icon: railIcon}).addTo(mymap).bindPopup(`<span id="rail">Rail Station: </span>${DATA_STORE[i].location_name}, ${DATA_STORE[i].distance} miles away`).openPopup();
+    if (APP_DATA[i].location_type == 'bus_stops') {
+      var marker = L.marker([APP_DATA[i].location_lat, APP_DATA[i].location_lon], {icon: busIcon}).bindPopup(`<span id="bus">Bus Stop: </span>${APP_DATA[i].location_name}, ${APP_DATA[i].distance} miles away.`).openPopup().addTo(mymap).on('click', event => {
+        addRoutesToAppData(APP_DATA[i]);
+      });
       markerGroup.push(marker);
     }
-    else if (DATA_STORE[i].location_type == 'trolley_stops') {
-      var marker = L.marker([DATA_STORE[i].location_lat, DATA_STORE[i].location_lon], {icon: trolleyIcon}).addTo(mymap).bindPopup(`<span id="trolley">Trolley Stop: </span>${DATA_STORE[i].location_name}, ${DATA_STORE[i].distance} miles away`).openPopup();
+    else if (APP_DATA[i].location_type == 'rail_stations') {
+      var marker = L.marker([APP_DATA[i].location_lat, APP_DATA[i].location_lon], {icon: railIcon}).addTo(mymap).bindPopup(`<span id="rail">Rail Station: </span>${APP_DATA[i].location_name}, ${APP_DATA[i].distance} miles away`).openPopup().on('click', railOrSalesIconEvent);
       markerGroup.push(marker);
     }
-    else if (DATA_STORE[i].location_type == 'sales_locations') {
-      var marker = L.marker([DATA_STORE[i].location_lat, DATA_STORE[i].location_lon], {icon: salesIcon}).addTo(mymap).bindPopup(`<span id="sales">Sales Location: </span>${DATA_STORE[i].location_name}, ${DATA_STORE[i].distance} miles away`).openPopup();
+    else if (APP_DATA[i].location_type == 'trolley_stops') {
+      var marker = L.marker([APP_DATA[i].location_lat, APP_DATA[i].location_lon], {icon: trolleyIcon}).addTo(mymap).bindPopup(`<span id="trolley">Trolley Stop: </span>${APP_DATA[i].location_name}, ${APP_DATA[i].distance} miles away`).openPopup().on('click', trolleyIconEvent);
+      markerGroup.push(marker);
+    }
+    else if (APP_DATA[i].location_type == 'sales_locations') {
+      var marker = L.marker([APP_DATA[i].location_lat, APP_DATA[i].location_lon], {icon: salesIcon}).addTo(mymap).bindPopup(`<span id="sales">Sales Location: </span>${APP_DATA[i].location_name}, ${APP_DATA[i].distance} miles away`).openPopup().on('click', railOrSalesIconEvent);
       markerGroup.push(marker);
     } 
   }
 }
+
+
+function addRoutesToAppData (currentObject) {
+  searchRoutesAPI(currentObject.location_id, pushRoutes => {
+    let busNumbers = Object.keys(pushRoutes).join(', ');
+    currentObject['routes'] = busNumbers;
+    busIconEvent(currentObject);
+  });
+}
+
+function busIconEvent (currentObject) {
+  $('.js-search-results').append(`<span id="bus">Bus Stop: </span>${currentObject.location_name}, ${currentObject.distance} miles away.<br> Bus Routes: ${currentObject.routes} `);
+}
+
 
 function checkResultLocationData(data) {
   try {
