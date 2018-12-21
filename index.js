@@ -1,16 +1,14 @@
 // septa ref: http://www3.septa.org/hackathon/
-// septa station locator endpoint: http://www3.septa.org/hackathon/locations/get_locations.php
-// uber ID: Gn2qYCxgHDwctLFwDe3tH1hBXhPWml8j server token: SR8oqWmMGFKeuRSIrbwRZGeTC_1574BHpWwE97uD
-// uber price ref: https://developer.uber.com/docs/riders/references/api/v1.2/estimates-price-get
-// bus_stops , rail_stations , trolley_stops , sales_locations
 // icon example: L.marker([51.5, -0.09], {icon: greenIcon}).addTo(map);
 
 'use strict';
 
-// API
+// API ENDPOITNS
 
-const SEPTA_LOCATION_URL =
+const SEPTA_STOP_LOCATION_URL =
   'http://www3.septa.org/hackathon/locations/get_locations.php';
+const OPEN_MAPS_URL = 'https://nominatim.openstreetmap.org/search?format=json&q=';
+const SEPTA_SCHEDULES_URL = 'http://www3.septa.org/hackathon/BusSchedules/';
 
 // MAP INIT
 
@@ -24,10 +22,6 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
 }).addTo(mymap);
 
 // MAP ICONS
-
-var markerGroup = [];
-var circleGroup = [];
-var currentLocationMarker = [];
 
 var myLocationIcon = new L.Icon({
   iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -74,41 +68,124 @@ var salesIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-// APP FUNCTION
-// create file for each API call
+// GLOBAL VARIABLES
 
-function convertSearchTerms(street, city, radius) {
+var markerGroup = [];
+var circleGroup = [];
+var currentLocationMarker = [];
+var typeInputList = [];
+
+// API CALLS
+
+function searchRoutesAPI(route, callback) {
+  const data = {
+    req1: route
+  };
+  $.ajax({
+    url: SEPTA_SCHEDULES_URL, data,
+    dataType: 'jsonp',
+    success: callback
+  });
+}  
+
+function searchStopLocationAPI(params, callback) {
+  const data = {
+    lon: params.lonInput,
+    lat: params.latInput,
+    radius: params.radius
+  };
+  $.ajax({
+    url: SEPTA_STOP_LOCATION_URL, data,
+    dataType: 'jsonp',
+    success: callback
+  });
+}
+
+// function searchStopLocationAPI(params, callback) {
+//   const data = {
+//     lon: params.lonInput,
+//     lat: params.latInput,
+//     radius: params.radius
+//   };
+//   const url = SEPTA_STOP_LOCATION_URL + '?' + data;
+
+//   console.log(url);
+
+//   fetch(url)
+//     .then(response => {
+//       if (response.ok) {
+//         return response.json();
+//       }
+//       throw new Error(response.statusText);
+//     })
+//     .then(responseJson => callback(responseJson))
+//     .catch(err => {
+//       $('#js-error-message').text(`Something went wrong: ${err.message}`);
+//     });
+// }
+
+// function searchOpenMapsAPI(street, city, radius) {
+//   let streetNoSpaces = street.replace(/\s+/g, '%20');
+//   let space = '%20';
+//   let address = streetNoSpaces.concat(space, city);
+//   const url = OPEN_MAPS_URL + address;
+//   console.log(url);
+//   fetch(url, radius)
+//     .then(response => {
+//       if (response.ok) {
+//         return response.json();
+//       }
+//       throw new Error(response.statusText)
+//         .then(responseJson => convertAddressToCoords(responseJson, radius))
+//         .catch(err => {
+//           $('#js-error-message').text(`Something went wrong: ${err.message}`);
+//         });
+//     });
+// }
+
+function searchOpenMapsAPI(street, city, radius) {
   let space = '%20';
   let address = street.concat(space, city);
   $.get('https://nominatim.openstreetmap.org/search?format=json&q='+address, function(location){
-    let latInput = location[0]['lat'];
-    let lonInput = location[0]['lon'];
-    const searchTerms = {
-      lonInput, latInput, radius
-    };
-    searchAPI(searchTerms, generateLocationIcons);
-    displayMapResults(latInput, lonInput, radius);
+    convertAddressToCoords(location, radius);
   });
 }
 
-var typeInput = [];
+// USING GPS 
 
+function convertAddressToCoords(location, radius) {
+  let latInput = location[0]['lat'];
+  let lonInput = location[0]['lon'];
+  const searchTerms = {
+    lonInput, latInput, radius
+  };
+  searchStopLocationAPI(searchTerms, generateResultLocationMarkers);
+  generateCurrentLocationMarker(latInput, lonInput);
+  generateRadiusCircle(latInput, lonInput, radius);
+}
 
-function toggleTextInputs() {
+function watchTextInputToggle() {
   $('#js-current-location').change( function() {
     if (this.checked) {
-      $('#js-query-street').val('').prop('disabled', true);
-      $('#js-query-city').val('').prop('disabled', true);      
+      toggleTextOn();      
     }
     else {
-      $('#js-query-street').prop('disabled', false);
-      $('#js-query-city').prop('disabled', false);
+      toggleTextOff();
     }
   });
 }
 
+function toggleTextOn() {
+  $('#js-query-street').val('').prop('disabled', true);
+  $('#js-query-city').val('').prop('disabled', true);
+}
 
-function getCurrentLocation(radius) {
+function toggleTextOff() {
+  $('#js-query-street').prop('disabled', false);
+  $('#js-query-city').prop('disabled', false);
+}
+
+function useCurrentLocation(radius) {
   if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition(function(position){ 
       let latInput = position.coords.latitude;
@@ -116,8 +193,9 @@ function getCurrentLocation(radius) {
       const searchTerms = {
         lonInput, latInput, radius
       };
-      searchAPI(searchTerms, generateLocationIcons);
-      displayMapResults(latInput, lonInput, radius);
+      searchStopLocationAPI(searchTerms, generateResultLocationMarkers);
+      generateCurrentLocationMarker(latInput, lonInput);
+      generateRadiusCircle(latInput, lonInput, radius);
     });
   }
   else {
@@ -125,43 +203,63 @@ function getCurrentLocation(radius) {
   }
 }
 
+// APP FUNCTIONS
+
 function watchSubmit() {
   $('.js-search-form').on( 'submit', event => {
     event.preventDefault();
+    const radiusInput = $('#js-query-radius').val();
     if ( $('#js-current-location').prop('checked') == true ) {
-      const radiusInput = $('#js-query-radius').val();
-      getCurrentLocation(radiusInput);
+      useCurrentLocation(radiusInput);
     }
     else {
       const streetInput = $('#js-query-street').val();
       const cityInput = $('#js-query-city').val();
-      const radiusInput = $('#js-query-radius').val();
-      convertSearchTerms(streetInput, cityInput, radiusInput);
+      searchOpenMapsAPI(streetInput, cityInput, radiusInput);
     }
-    typeInput = [];
-    $('.js-search-form').find('.input-option').each(function(){
-      if ( $(this).prop('checked') == true ) { 
-        let typeChecked = $(this).val();    
-        typeInput.push(typeChecked);   
-      }
-    });
-  });}
-
-
-function searchAPI(params, callback) {
-  const data = {
-    lon: params.lonInput,
-    lat: params.latInput,
-    radius: params.radius
-  };
-  $.ajax({
-    url: SEPTA_LOCATION_URL, data,
-    dataType: 'jsonp',
-    success: callback
+    createTypeListInput();
   });
 }
 
-function generateLocationIcons(data) {  
+function createTypeListInput() {
+  typeInputList = [];
+  $('.js-search-form').find('.input-option').each(function(){
+    if ( $(this).prop('checked') == true ) { 
+      let typeChecked = $(this).val();    
+      typeInputList.push(typeChecked);
+    }
+  });
+}
+
+function generateResultLocationMarkers(data) {  
+  checkResultLocationData(data);
+  clearMapMarkers();
+  for (let i = 0; i < data.length; i++)
+  {
+    if (typeInputList.includes('bus_stops') && data[i].location_type == 'bus_stops') {
+      let routeID = data[i].location_id;
+      searchRoutesAPI(routeID, routes => {
+        let busNumbers = Object.keys(routes).join(', ');
+        var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span id="bus">Bus Stop: </span>${data[i].location_name}, ${data[i].distance} miles away.<br>Stops here: ${busNumbers}`).openPopup();
+        markerGroup.push(marker);
+        console.log('routes function is working', routes);});
+    }
+    else if (typeInputList.includes('rail_stations') && data[i].location_type == 'rail_stations') {
+      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: railIcon}).addTo(mymap).bindPopup(`<span id="rail">Rail Station: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
+      markerGroup.push(marker);
+    }
+    else if (typeInputList.includes('trolley_stops') && data[i].location_type == 'trolley_stops') {
+      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: trolleyIcon}).addTo(mymap).bindPopup(`<span id="trolley">Trolley Stop: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
+      markerGroup.push(marker);
+    }
+    else if (typeInputList.includes('sales_locations') && data[i].location_type == 'sales_locations') {
+      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: salesIcon}).addTo(mymap).bindPopup(`<span id="sales">Sales Location: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
+      markerGroup.push(marker);
+    } 
+  }
+}
+
+function checkResultLocationData(data) {
   try {
     if (data == '') {
       throw new Error('API data is empty');
@@ -171,57 +269,31 @@ function generateLocationIcons(data) {
     console.log(e.name + ': ' + e.message);
     alert('No results for entered parameters.');
   }
+}
+
+function clearMapMarkers() {
   for (let i = 0; i < markerGroup.length; i++) {
     mymap.removeLayer(markerGroup[i]);
   }
   markerGroup = [];
-  for (let i = 0; i < data.length; i++)
-  {
-    if (typeInput.includes('bus_stops') && data[i].location_type == 'bus_stops') {
-      let routeID = data[i].location_id;
-      searchRoutesAPI(routeID, routes => {
-        let busNumbers = Object.keys(routes).join(',');
-        var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: busIcon}).addTo(mymap).bindPopup(`<span id="bus">Bus Stop: </span>${data[i].location_name}, ${data[i].distance} miles away.<br>Bus Numbers: ${busNumbers}`).openPopup();
-      markerGroup.push(marker);
-        console.log(`routes function is working`, routes)});
-    }
-    else if (typeInput.includes('rail_stations') && data[i].location_type == 'rail_stations') {
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: railIcon}).addTo(mymap).bindPopup(`<span id="rail">Rail Station: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
-      markerGroup.push(marker);
-    }
-    else if (typeInput.includes('trolley_stops') && data[i].location_type == 'trolley_stops') {
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: trolleyIcon}).addTo(mymap).bindPopup(`<span id="trolley">Trolley Stop: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
-      markerGroup.push(marker);
-    }
-    else if (typeInput.includes('sales_locations') && data[i].location_type == 'sales_locations') {
-      var marker = L.marker([data[i].location_lat, data[i].location_lon], {icon: salesIcon}).addTo(mymap).bindPopup(`<span id="sales">Sales Location: </span>${data[i].location_name}, ${data[i].distance} miles away`).openPopup();
-      markerGroup.push(marker);
-    } 
-  }
 }
 
-function searchRoutesAPI(route, callback) {
-  const data = {
-    req1: route
-  };
-  $.ajax({
-    url: 'http://www3.septa.org/hackathon/BusSchedules/', data,
-    dataType: 'jsonp',
-    success: callback
-  });
+function generateCurrentLocationMarker(lat, lon) {
+  clearCurrentLocationMarker();
+  var youAreHereMarker = L.marker([lat, lon], {icon: myLocationIcon}).addTo(mymap).bindPopup('You are here').openPopup();
+  (mymap).setView([lat, lon], 16);
+  currentLocationMarker.push(youAreHereMarker);
 }
 
-function displayMapResults(lat, lon, radiusInMiles) {
-  for (let i = 0; i < circleGroup.length; i++) {
-    mymap.removeLayer(circleGroup[i]);
-  }
-  circleGroup = [];
+function clearCurrentLocationMarker() {
   for (let i = 0; i < currentLocationMarker.length; i++) {
     mymap.removeLayer(currentLocationMarker[i]);
   }
   currentLocationMarker = [];
-  var youAreHereMarker = L.marker([lat, lon], {icon: myLocationIcon}).addTo(mymap).bindPopup('You are here').openPopup();
-  (mymap).setView([lat, lon], 16);
+}
+
+function generateRadiusCircle(lat, lon, radiusInMiles) {
+  clearRadiusCircle();
   let radiusInMeters = radiusInMiles * 1609.344;
   var circle = L.circle([lat, lon], {
     color: 'gray',
@@ -230,26 +302,16 @@ function displayMapResults(lat, lon, radiusInMiles) {
     radius: radiusInMeters
   }).addTo(mymap);
   circleGroup.push(circle);
-  currentLocationMarker.push(youAreHereMarker);
 }
 
-// function displayListTemplate() {
-//   $('.js-search-results').append();
-// }
+function clearRadiusCircle() {
+  for (let i = 0; i < circleGroup.length; i++) {
+    mymap.removeLayer(circleGroup[i]);
+  }
+  circleGroup = [];
+}
 
-$(toggleTextInputs);
+$(watchTextInputToggle);
 $(watchSubmit);
 
-//    $('#js-query-type-bus').click(function() {
-// // typeInput.push('bus_stops'); 
-// // });
-// // $('#js-query-type-trolley').click(function() {
-// // typeInput.push('trolley_stops'); 
-// // });
-// // $('#js-query-type-rail').click(function() {
-// // typeInput.push('rail_stations'); 
-// // });
-// // $('#js-query-type-sales').click(function() {
-// // typeInput.push('sales_locations'); 
-// // }); 
 
