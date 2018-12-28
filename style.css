@@ -1,23 +1,187 @@
-#mapid { 
-    height: 500px;
-    width: 500px; }
+* {
+    box-sizing: border-box;
+}
 
-    #bus {
-        font-weight: bold;
-        color: blue;
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Titillium Web', sans-serif;
+}
+html, body, #mapid {
+    height: 100%;
+    width: 100%;
+}
+
+#mapid {
+    position: relative;
+    z-index: 0;
+}
+
+fieldset {
+    border: 0px;
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
+}
+
+h1 {
+    font-size: 25px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+h2 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.overlay {
+    position: fixed;
+    z-index: 2;
+    text-align: center; 
+}
+
+#search-box {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid gray;
+    width: 60%;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px 5px 20px 5px;
+}
+
+.hidden {
+    display:none;
+}
+
+#js-search-results {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid gray;
+    width: 80%;
+    height: 100px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 17px;
+    padding: 5px 5px 5px 5px;
+}
+
+input[type="text"] {
+    background-color: rgba(115, 182, 230, 0.6);
+    border: 1px solid gray;
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.input-option {
+    display: inline-block;
+  }
+  
+#bus {
+    font-weight: bold;
+    color: blue;
+}
+
+#rail {
+    font-weight: bold;
+    color: red;
+}
+
+#trolley {
+    font-weight: bold;
+    color: #999900;
+}
+
+#sales {
+    font-weight: bold;
+    color: purple;
+}
+
+h2 {
+    font-size: 17px;       
+    display: inline-block;
+    font-weight: bold;
+}
+
+label {
+    font-size: 17px;
+}
+
+.button {
+    font-size: 17px;
+    font-family: 'Titillium Web', sans-serif;
+    background-color: rgba(231, 231, 231, 0.767);
+    border: 1px solid gray;
+    width: 150px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    font-weight: bold;
+}
+
+.button:hover, .button:focus {
+    background-color: rgba(115, 182, 230, 0.6);
+    border: 1px solid gray; 
+}
+
+p {
+    margin-bottom: 2px;
+    margin-top: 0px;
+}
+
+.input-container label {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    display: inline-block;
+}
+
+@media only screen 
+and (min-device-width: 320px) 
+and (max-device-width: 766px) 
+{
+    .js-search-form .input-option {
+        width: 100%;
+    } 
+    
+    #search-box {
+        width: 80%;
+        padding: 0px 15px 8px 15px;
     }
 
-    #rail {
-        font-weight: bold;
-        color: red;
-    }
- 
-    #trolley {
-        font-weight: bold;
-        color: #999900;
+    .checkbox {
+        display: inline-block;
     }
 
-    #sales {
-        font-weight: bold;
-        color: purple;
+    h1 {
+        font-size: 22px;
     }
+
+    p {
+        margin-bottom: 0px;
+    }
+
+    #js-search-results {
+        font-size: 15px;
+    }
+
+    #reload {
+        font-size: 15px;
+    }
+}
+
+@media (orientation: portrait) {
+    #js-search-results {
+        height: 105px;
+    }
+}
+
+@media (orientation: landscape) {
+    #js-search-results {
+        height: 95px;
+    }
+}

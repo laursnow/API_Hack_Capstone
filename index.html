@@ -1,60 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width">
-        <title>App</title>
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
-        integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
-        crossorigin=""/>
-        <link href="style.css" rel="stylesheet" type="text/css" />
-        
-    </head>
-    <body>
-      <main>
-        <h1>Public Transportation Finder</h1>
-          <form action="#" class="js-search-form">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Philly Public Transportation Finder</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+  integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+  crossorigin=""/>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
+</head>
 
-            <label for="longitude">Street</label>
-            <input type="text" id="js-query-street" name="Street" class="input-option"><br>
-
-            <label for="latitude">City</label>
-            <input type="text" id="js-query-city" name="City" class="input-option"><br>
-
-            <label for="radius">Radius</label>
-            <input type="text" id="js-query-radius" name="radius" class="input-option"><br>
-            <label for="bus-stops">Use Current Location</label>
-            <input type="checkbox" id="js-current-location" name="current-location" value="current-location"><br>
-
-            <h2>Show:</h2>
-            <label for="bus-stops">Bus Stops</label>
-            <input type="checkbox" id="js-query-type-bus" name="type" value="bus_stops" class="input-option"><br>
-            <label for="trolley-stops">Trolley Stops</label>
-            <input type="checkbox" id="js-query-type-trolley" name="type" value="trolley_stops" class="input-option"><br>
-            <label for="rail-stations">Rail Stations</label>
-            <input type="checkbox" id="js-query-type-rail" name="type" value="rail_stations" class="input-option"><br>
-            <label for="sales-stations">Sales Locations</label>
-            <input type="checkbox" id="js-query-type-sales" name="sales_locations" value="sales_locations" class="input-option">
-            
-
-            <button class="button" id="search">Search</button>
-          </form>
-          <div id="mapid"></div>
-          <h2>Results</h2><div class="container"><ul>
-            <div class="js-search-results" class="hidden">
-              <section class="hidden" id="bus"><h3>Bus Stops: </h3></section>
-              <section class="trolley hidden" id="trolley"><h3>Trolley Stops: </h3></section>
-              <section class="rail hidden" id="rail"><h3>Rail Stations: </h3></section>
-              <section class="sales hidden" id="sales"><h3>Sales Locations: </h3></section>
-            </div></ul>
-            </div>
-      </main>
-      <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
-        integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
-        crossorigin=""></script>
-      <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-      <script src="index.js"></script>
+<body>
+  <section class="" id="search-container">
+    <div class="overlay" id="search-box">
+      <h1>Philly Public Transportation Finder</h1>
+      <h2>Search for SEPTA transportation options around entered location.</h2>
       
-    </body>
-</html>
+      <div role="section" class="input-container">
+        <form action="#" class="js-search-form" role="search">
+        <fieldset>
+          <label for="js-query-street">Street: 
+            <input type="text" id="js-query-street" name="street" class="input-option" required></label>
+          <label for="js-query-city">City: 
+            <input type="text" id="js-query-city" name="city" class="input-option" required></label>
+          <label for="js-query-radius">Radius: 
+            <input type="text" id="js-query-radius" name="radius" class="input-option" placeholder="miles, ex: 0.25" required></label>
+      </div>
 
+      <div role="section" class="input-container">
+          <label for="js-current-location"><h2>Use Current Location</h2>
+            <input type="checkbox" id="js-current-location" name="current-location" value="current-location"></label>
+      </div>
+              
+      <div role="section" class="input-container"><h2>Include:</h2>
+          <label for="js-query-type-bus" class="checkbox">Bus Stops
+            <input type="checkbox" id="js-query-type-bus" name="type" value="bus_stops" class="input-option-check"></label>
+          <label for="js-query-type-trolley" class="checkbox">Trolley Stops
+            <input type="checkbox" id="js-query-type-trolley" name="type" value="trolley_stops" class="input-option-check"></label>
+          <label for="js-query-type-rail" class="checkbox">Rail Stations
+            <input type="checkbox" id="js-query-type-rail" name="type" value="rail_stations" class="input-option-check"></label>
+          <label for="js-query-type-sales" class="checkbox">Sales Locations
+            <input type="checkbox" id="js-query-type-sales" name="sales_locations" value="sales_locations" class="input-option-check"></label>
+        </fieldset>
+      </div>
+                      
+      <div role="section" class="input-container">  
+        <button class="button" id="search">Search</button>
+    </div></form></div>
+  </section>
+                    
+  <section class="hidden" id="result-container">
+    <div class="overlay" id="js-search-results" aria-live="assertive">
+      <p>Click on a marker to view more information.</p>
+      <p><button class="button" id="reload">New Search</button></p>
+    </section>
+    </div>
+                    
+  <div id="mapid"></div>
+                    
+  <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+  integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+  crossorigin=""></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="api.js"></script>
+  <script src="error.js"></script>
+  <script src="index.js"></script>
+                    
+</body>
+</html>
+                  
+                  
