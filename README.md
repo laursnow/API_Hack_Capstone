@@ -22,7 +22,7 @@ Landing screen. User can enter address or use GPS to utilize their current locat
 After entering information, address entered is indicated using a green pin, and locations selected are populated on the map within the entered radius.
 
 ![Detailed Results](https://raw.githubusercontent.com/laursnow/Philly-Public-Transportation-Finder/master/screenshots/result-details.png)
-Different location types are differentiated by different colored pins. User can cloik on pins to display information larger at the bottom of the page. Bus and trolley stops display additional information (specific route numbers). The API does not support this information for rail and sales locations.
+Different location types are differentiated by different colored pins. User can click on pins to display information larger at the bottom of the page. Bus and trolley stops display additional information (specific route numbers). The API does not support this information for rail and sales locations.
 
 ## Technology
 
