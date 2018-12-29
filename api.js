@@ -4,9 +4,9 @@
 const api = (function () {
   
   const SEPTA_STOP_LOCATION_URL =
-    'http://www3.septa.org/hackathon/locations/get_locations.php';
+    'https://www3.septa.org/hackathon/locations/get_locations.php';
   const OPEN_MAPS_URL = 'https://nominatim.openstreetmap.org/search?format=json&q=';
-  const SEPTA_SCHEDULES_URL = 'http://www3.septa.org/hackathon/BusSchedules/';
+  const SEPTA_SCHEDULES_URL = 'https://www3.septa.org/hackathon/BusSchedules/';
 
   // searchRoutesAPI only supports bus & trolley stops
   

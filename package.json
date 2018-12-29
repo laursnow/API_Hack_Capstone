@@ -1,25 +1,21 @@
 {
-  "name": "code",
+  "name": "api-capstone",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "browser-sync start --server --files ."
+    
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/laursnow/Philly-Public-Transportation-Finder.git"
+    "url": "git+https://github.com/laursnow/API_Hack_Capstone.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/laursnow/Philly-Public-Transportation-Finder/issues"
+    "url": "https://github.com/laursnow/API_Hack_Capstone/issues"
   },
-  "homepage": "https://github.com/laursnow/Philly-Public-Transportation-Finder#readme",
-  "engines": {
-    "node": "11.x"
-  }
+  "homepage": "https://github.com/laursnow/API_Hack_Capstone#readme"
 }
-
-
