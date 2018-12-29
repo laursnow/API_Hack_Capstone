@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/laursnow/Philly-Public-Transportation-Finder/issues"
   },
-  "homepage": "https://github.com/laursnow/Philly-Public-Transportation-Finder#readme"
+  "homepage": "https://github.com/laursnow/Philly-Public-Transportation-Finder#readme",
+  "engines": {
+    "node": "11.x"
+  }
 }
+
+
